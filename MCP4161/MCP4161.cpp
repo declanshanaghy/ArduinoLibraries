@@ -80,9 +80,17 @@ int MCP4161::setTap(int value) {
 	enable();
 
 	//  send in the address and value via SPI:
-	byte ret1 = SPI.transfer(0x0C);
-	byte ret2 = SPI.transfer(0x00);
+	byte h = 0x03 & (value >> 8);
+	byte l = 0x00FF & value;
+	
+	Serial.print("HIGH: ");
+	Serial.println(h, BIN);
+	Serial.print("LOW: ");
+	Serial.println(l, BIN);
+	
+	byte ret1 = SPI.transfer(h);
+	byte ret2 = SPI.transfer(l);
 
 	disable();	
-	return 0;
+	return (ret1 << 8) | ret2;
 }
