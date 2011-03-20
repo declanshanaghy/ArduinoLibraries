@@ -36,7 +36,7 @@ void DS1802::setMute(boolean m0, boolean m1) {
 	DBG("DS1802::setMute: ");
 	DBG(m0 ? "1" : "0");
 	DBG(",");
-	DBG(m1 ? "1" : "0");
+	DBGLN(m1 ? "1" : "0");
 }
 
 void DS1802::setValues(int v0, int v1) {

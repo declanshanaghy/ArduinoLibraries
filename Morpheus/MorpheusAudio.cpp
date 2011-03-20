@@ -7,13 +7,13 @@ MorpheusAudio::MorpheusAudio(int addr)
 
 void MorpheusAudio::stop() {
 	Wire.beginTransmission(_addr);
-	Wire.send('S');
+	Wire.send((short)'s');
 	Wire.endTransmission();
 }
 
 void MorpheusAudio::playRandom() {
 	Wire.beginTransmission(_addr);
-	Wire.send('R');
+	Wire.send((short)'r');
 	Wire.endTransmission();
 }
 

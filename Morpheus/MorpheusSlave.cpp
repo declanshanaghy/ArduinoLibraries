@@ -104,5 +104,7 @@ void MorpheusSlave::receiveEvent(int n) {
 		}
 		i++;
 	}
+	
+	endComm();
 }
 
