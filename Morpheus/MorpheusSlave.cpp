@@ -1,9 +1,7 @@
 #include "MorpheusSlave.h"
 
-MorpheusSlave::MorpheusSlave(int addr)
+MorpheusSlave::MorpheusSlave()
 {
-	_addr = addr;
-
 	reset();
 	
 	// if analog input pin 0 is unconnected, random analog
@@ -11,29 +9,55 @@ MorpheusSlave::MorpheusSlave(int addr)
 	// different seed numbers each time the sketch runs.
 	// randomSeed() will then shuffle the random function.
 	randomSeed(analogRead(0));
-
-	Wire.begin(addr); // join i2c bus as a slave
-
 }
 
 boolean MorpheusSlave::newCommand() {
-	return exec;
+	return _exec;
 }
 
 void MorpheusSlave::reset() {
-	rxs = 0;
-	lastRX = -1;
-	exec = false;
+	_rxs = 0;
+	_lastRX = -1;
+	_exec = false;
 	command = 0;
     for ( int i=0; i<N_DATA; i++)
 		data[i] = 0;
 	
 }
 
+int MorpheusSlave::getIntData() {
+	return getIntData(0, N_DATA);
+}
+
+int MorpheusSlave::getIntData(int start) {
+	return getIntData(start, N_DATA);
+}
+
+int MorpheusSlave::getIntData(int start, int end) {
+	int v = 0;
+	char ch;
+		
+	for ( int i=start; i<N_DATA && i < end; i++ ) {
+		ch = data[i];  
+		switch(data[i]) {
+			case '0'...'9':
+				v = v * 10 + ch - '0';
+				break;
+			case 0:
+				break;
+			default:
+				Serial.print("getIntData: unahndled - ");
+				Serial.println(ch);
+				break;
+		}
+	}
+	return v;
+}
+
 void MorpheusSlave::endComm() {
-	rxs = 0;
-	lastRX = -1;
-	exec = true;
+	_rxs = 0;
+	_lastRX = -1;
+	_exec = true;
 	Serial.flush();
     
 	Serial.print("command: ");
@@ -49,42 +73,43 @@ void MorpheusSlave::receiveSerial() {
 	if ( Serial.available() )  {
 		byte b;
 		while ( Serial.available() > 0 ) {
-			if ( rxs > N_DATA ) {
+			if ( _rxs > N_DATA ) {
 				endComm();
 				break;
 			}
 			
-			lastRX = millis();
+			_lastRX = millis();
 			b = Serial.read();
 			if ( b == '\n' ) {
 				endComm();
 				break;
 			}
 			else {
-				switch ( rxs ) {
+				switch ( _rxs ) {
 					case 0:
+						Serial.print("SER receiveEvent: ");
 						command = b;
 						break;
 					default:
-						data[rxs-1] = b;
+						data[_rxs-1] = b;
 						break;
 				}
 			}
-			rxs++;
+			_rxs++;
 		}
 		
-		if ( rxs > N_DATA ) {
+		if ( _rxs > N_DATA ) {
 			endComm();
 		}
 	}
 	
-	if ( lastRX != -1 && millis() - lastRX > RX_DELAY ) {
+	if ( _lastRX != -1 && millis() - _lastRX > RX_DELAY ) {
 		endComm();
 	}
 }
 
-void MorpheusSlave::receiveEvent(int n) {
-	Serial.print("receiveEvent: ");
+void MorpheusSlave::receiveI2C(int n) {
+	Serial.print("I2C receiveEvent: ");
 	Serial.println(n);
 	
 	int i = 0;
@@ -99,7 +124,6 @@ void MorpheusSlave::receiveEvent(int n) {
 				break;
 			default:
 				data[i-1] = Wire.receive();
-				Serial.print(data[i-1]);
 				break;
 		}
 		i++;

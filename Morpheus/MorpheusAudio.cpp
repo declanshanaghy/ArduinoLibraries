@@ -17,3 +17,9 @@ void MorpheusAudio::playRandom() {
 	Wire.endTransmission();
 }
 
+void MorpheusAudio::indexFiles() {
+	Wire.beginTransmission(_addr);
+	Wire.send((short)'i');
+	Wire.endTransmission();
+}
+

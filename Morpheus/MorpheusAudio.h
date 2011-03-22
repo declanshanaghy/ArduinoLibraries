@@ -10,6 +10,7 @@ public:
     MorpheusAudio(int addr);
 	void stop();
 	void playRandom();
+	void indexFiles();
 	
 private:
     int _addr;
