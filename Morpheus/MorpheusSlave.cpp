@@ -1,7 +1,8 @@
 #include "MorpheusSlave.h"
 
-MorpheusSlave::MorpheusSlave()
+MorpheusSlave::MorpheusSlave(int nData)
 {
+	_nData = nData;
 	reset();
 	
 	// if analog input pin 0 is unconnected, random analog
@@ -16,57 +17,41 @@ boolean MorpheusSlave::newCommand() {
 }
 
 void MorpheusSlave::reset() {
+#if DBG
+	Serial.print("reset");
+#endif
 	_rxs = 0;
 	_lastRX = -1;
 	_exec = false;
-	command = 0;
+	command = NULL;
     for ( int i=0; i<N_DATA; i++)
-		data[i] = 0;
-	
+		data[i] = NULL;	
 }
 
-int MorpheusSlave::getIntData() {
-	return getIntData(0, N_DATA);
+uint8_t MorpheusSlave::getData(int pos) {
+	return data[pos];
 }
 
-int MorpheusSlave::getIntData(int start) {
-	return getIntData(start, N_DATA);
-}
-
-int MorpheusSlave::getIntData(int start, int end) {
-	int v = 0;
-	char ch;
-		
-	for ( int i=start; i<N_DATA && i < end; i++ ) {
-		ch = data[i];  
-		switch(data[i]) {
-			case '0'...'9':
-				v = v * 10 + ch - '0';
-				break;
-			case 0:
-				break;
-			default:
-				Serial.print("getIntData: unahndled - ");
-				Serial.println(ch);
-				break;
-		}
-	}
-	return v;
+char MorpheusSlave::getChar(int pos) {
+	return data[pos];
 }
 
 void MorpheusSlave::endComm() {
 	_rxs = 0;
 	_lastRX = -1;
 	_exec = true;
-	Serial.flush();
+	//Serial.flush();
     
+#if DBG
 	Serial.print("command: ");
 	Serial.print(command);
 	Serial.print(" ");
-	for ( int i=0; i<N_DATA; i++) {
-		Serial.print(data[i]);
+	for ( int i=0; i < N_DATA && data[i] != NULL; i++) {
+		Serial.print(data[i], DEC);
+		Serial.print(',');
 	}
 	Serial.println();
+#endif
 }
 
 void MorpheusSlave::receiveSerial() {
@@ -87,7 +72,9 @@ void MorpheusSlave::receiveSerial() {
 			else {
 				switch ( _rxs ) {
 					case 0:
+#if DBG
 						Serial.print("SER receiveEvent: ");
+#endif
 						command = b;
 						break;
 					default:
@@ -96,6 +83,10 @@ void MorpheusSlave::receiveSerial() {
 				}
 			}
 			_rxs++;
+			if ( _rxs == _nData ) {
+				endComm();
+				break;
+			}
 		}
 		
 		if ( _rxs > N_DATA ) {
@@ -103,17 +94,19 @@ void MorpheusSlave::receiveSerial() {
 		}
 	}
 	
-	if ( _lastRX != -1 && millis() - _lastRX > RX_DELAY ) {
+	if ( _lastRX != -1 && millis() - _lastRX > RX_TIMEOUT ) {
 		endComm();
 	}
 }
 
 void MorpheusSlave::receiveI2C(int n) {
+#if DBG
 	Serial.print("I2C receiveEvent: ");
 	Serial.println(n);
+	Serial.print("I2C: ");
+#endif
 	
 	int i = 0;
-	Serial.print("I2C: ");
 	while ( Wire.available() > 0 ){
 		if ( i > N_DATA ) {
 			break;
