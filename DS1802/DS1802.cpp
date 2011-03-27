@@ -25,25 +25,35 @@ void DS1802::toggleMute() {
 	digitalWrite(_pMute, LOW);
 	delay(50);
 	digitalWrite(_pMute, HIGH);
-	DBGLN("DS1802::toggleMute");
+#ifdef DBG
+	Serial.println("DS1802::toggleMute");
+#endif
+}
+
+void DS1802::setMuteMask(boolean m0, boolean m1) {
+	_m0 = m0 ? 0xC0 : 0x80;
+	_m1 = m1 ? 0xC0 : 0x80;
 }
 
 void DS1802::setMute(boolean m0, boolean m1) {
-	_m0 = m0 ? 0xC0 : 0x80;
-	_m1 = m1 ? 0xC0 : 0x80;
-	DBGLNF(_m0, HEX);
+	setMuteMask(m0, m1);
 	tx();
-	DBG("DS1802::setMute: ");
-	DBG(m0 ? "1" : "0");
-	DBG(",");
-	DBGLN(m1 ? "1" : "0");
+#ifdef DBG
+	Serial.print("DS1802::setMute: ");
+	Serial.print(m0 ? "1" : "0");
+	Serial.print(",");
+	Serial.println(m1 ? "1" : "0");
+#endif
 }
 
 void DS1802::setValues(int v0, int v1) {
-	DBG("DS1802::setValues: ");
-	DBG(v0);
-	DBG(",");
-	DBGLN(v1);
+#ifdef DBG
+	Serial.print("DS1802::setValues: ");
+	Serial.print(v0);
+	Serial.print(",");
+	Serial.println(v1);
+#endif
+	setMuteMask(false, false);
 
 	if ( v0 < DS1802_MIN ) v0 = DS1802_MIN;
 	if ( v0 > DS1802_MAX ) v0 = DS1802_MAX;
@@ -66,10 +76,12 @@ void DS1802::tx() {
 	SPI.transfer(vc1);
 	disable();
 	
-	DBG("DS1802::tx: ");
-	DBGF(vc0, BIN);
-	DBG(" ");
-	DBGLNF(vc1, BIN);
+#ifdef DBG
+	Serial.print("DS1802::tx: ");
+	Serial.print(vc0, BIN);
+	Serial.print(" ");
+	Serial.println(vc1, BIN);
+#endif
 }
 			   
 void DS1802::enable() {

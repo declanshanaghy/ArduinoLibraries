@@ -13,11 +13,6 @@
 
 #define DEBUG 1
 
-#define DBG(a) Serial.print(a)
-#define DBGF(a,b) Serial.print(a,b)
-#define DBGLN(a) Serial.println(a)
-#define DBGLNF(a,b) Serial.println(a,b)
-
 class DS1802
 {
 public:
@@ -33,6 +28,8 @@ private:
 	int _v1;
 	boolean _m0;
 	boolean _m1;
+
+	void setMuteMask(boolean m0, boolean m1);
 	void enable();
 	void disable();
 	void tx();
