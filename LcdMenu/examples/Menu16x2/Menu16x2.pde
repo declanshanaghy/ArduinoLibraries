@@ -27,14 +27,23 @@ void setup() {
 boolean fwd = true;
 
 void loop() {
-  delay(5000);
   menu.display();
+  boolean result;
   if ( fwd ) {
-    fwd = menu.advance();
+    result = menu.page();
   }
   else {
-    fwd = !menu.reverse();
+    result = !menu.pageReverse();
   }
+  
+  if ( result == fwd ) {
+#ifdef DEBUG
+  Serial.println("DELAY");
+#endif
+    delay(2000);
+  }
+
+  fwd = result;
 }
 
 #define MENU_STAYOPEN   1
@@ -53,7 +62,6 @@ void setupMenu() {
   m3.setSiblings(&m2, &m4);
   m4.setSiblings(&m3, NULL);
   menu.setHead(&m1);
-  menu.display();
 }
 
 void setupLCD() {

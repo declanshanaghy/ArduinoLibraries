@@ -14,7 +14,7 @@ public:
 	void setChild(LcdMenuEntry* child) { _child = child; };	
 	void setPrev(LcdMenuEntry* prev) { _prev = prev; };	
 	void setNext(LcdMenuEntry* next) { _next = next; };	
-	void setSiblings(LcdMenuEntry* prev, LcdMenuEntry* next) { _next = next; };	
+	void setSiblings(LcdMenuEntry* prev, LcdMenuEntry* next) { _prev = prev; _next = next; };	
 	
 	char* displayText;
 	LcdMenuEntry* _child;
@@ -30,15 +30,17 @@ class LcdMenu
 {
 public:
     LcdMenu(const LiquidCrystal& lcd, const int cols, const int rows)  
-		:	_lcd(lcd), _rows(rows), _cols(cols), _curRow(0) {
+		:	_lcd(lcd), _rows(rows), _cols(cols) {
 	};
 	~LcdMenu();
 	
 	void setHead(LcdMenuEntry* main);
 	void display();
 	void clear();
-	boolean advance();
-	boolean reverse();
+	boolean step();
+	boolean page();
+	boolean stepReverse();
+	boolean pageReverse();
 	void displayCurrent();
 		
 private:
@@ -47,7 +49,6 @@ private:
 	LcdMenuEntry* _current;
 	int _cols;
 	int _rows;
-	int _curRow;
 };
 
 #endif

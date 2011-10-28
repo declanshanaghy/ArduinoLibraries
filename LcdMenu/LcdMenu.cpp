@@ -20,25 +20,34 @@ void LcdMenu::setHead(LcdMenuEntry* main) {
 
 void LcdMenu::clear() {
 	_lcd.clear();
-	_lcd.setCursor(0, 0);
-	_curRow = 0;
-#if DEBUG
+#ifdef DEBUG
 	Serial.println("CLEAR");
 #endif
 }
 
-boolean LcdMenu::advance() {
+boolean LcdMenu::page() {
+	short count = 0;
+	while ( count < _rows ) {
+		count++;
+		if (!step())
+			break;
+	}
+#ifdef DEBUG
+	Serial.print("count == _rows? "); Serial.print(count); Serial.print(" == "); Serial.println(_rows);
+#endif		
+	return count == _rows;
+}
+
+boolean LcdMenu::step() {
 	if ( _current->_next != NULL ) {
 		_current = _current->_next;
-		_curRow++;
-		_lcd.setCursor(0, _curRow);
-#if DEBUG
+#ifdef DEBUG
 		Serial.println("ADVANCE");
 #endif		
 		return true;
 	}
 	else {
-#if DEBUG
+#ifdef DEBUG
 		Serial.println("CANT ADVANCE");
 #endif		
 		return false;
@@ -46,12 +55,23 @@ boolean LcdMenu::advance() {
 	
 }
 
-boolean LcdMenu::reverse() {
+boolean LcdMenu::pageReverse() {
+	short count = 0;
+	while ( count < _rows ) {
+		count++;
+		if (!stepReverse())
+			break;
+	}
+#ifdef DEBUG
+	Serial.print("count == _rows"); Serial.print(count); Serial.print(" == "); Serial.println(_rows);
+#endif		
+	return count == _rows;
+}
+
+boolean LcdMenu::stepReverse() {
 	if ( _current->_prev != NULL ) {
 		_current = _current->_prev;
-		_curRow--;
-		_lcd.setCursor(0, _curRow);
-#if DEBUG
+#ifdef DEBUG
 		Serial.println("REVERSE");
 #endif		
 		return true;
@@ -65,23 +85,22 @@ boolean LcdMenu::reverse() {
 	
 }
 
-void LcdMenu::displayCurrent() {
-#if DEBUG
-	Serial.print("DISPLAY "); Serial.println(_current->displayText);
-#endif
-	_lcd.print(_current->displayText);
-}
-
 void LcdMenu::display() {
 	clear();
+	LcdMenuEntry* pos = _current;
+	short curRow = 0;
 	
-	if ( _current != NULL ) {
-		do {
-			displayCurrent();
-		}
-		while ( _curRow < _rows-1 && advance() );
-#if DEBUG
+	while ( curRow < _rows && pos != NULL ) {
+#ifdef DEBUG
+		Serial.print("DISPLAY "); Serial.println(pos->displayText);
+#endif
+		_lcd.setCursor(0, curRow);
+		_lcd.print(pos->displayText);
+		curRow++;
+			
+		pos = pos->_next;
+	}
+#ifdef DEBUG
 		Serial.println("DISPLAY DONE");
 #endif
-	}
 }
