@@ -1,54 +1,69 @@
-#ifndef LCDMENU_h
-#define LCDMENU_h
+#ifndef LCDMENUh
+#define LCDMENUh
 
 #include <WProgram.h>
 #include <LiquidCrystal.h>
 
 #define DEBUG 1
 
+typedef void (*HANDLER)(void);
+
 class LcdMenuEntry {
 public:
-	LcdMenuEntry(const short id, const char* text);
+	LcdMenuEntry(const char id, const char* text, HANDLER handler);
 	~LcdMenuEntry();
 	
-	void setChild(LcdMenuEntry* child) { _child = child; };	
-	void setPrev(LcdMenuEntry* prev) { _prev = prev; };	
-	void setNext(LcdMenuEntry* next) { _next = next; };	
-	void setSiblings(LcdMenuEntry* prev, LcdMenuEntry* next) { _prev = prev; _next = next; };	
+	void setChild(LcdMenuEntry* child) { this->child = child; child->parent = this; };	
+	void setPrev(LcdMenuEntry* prev) { this->prev = prev; };	
+	void setNext(LcdMenuEntry* next) { this->next = next; };	
+	void setSiblings(LcdMenuEntry* prev, LcdMenuEntry* next) { this->prev = prev; this->next = next; };	
 	
-	char* displayText;
-	LcdMenuEntry* _child;
-	LcdMenuEntry* _prev;
-	LcdMenuEntry* _next;
+	const char getId() { return id; };
+	const char* getDisplayText() { return displayText; };
+	const char* getText() { return text; };
+	LcdMenuEntry* getParent() { return parent; };
+	LcdMenuEntry* getChild() { return child; };
+	LcdMenuEntry* getPrev() { return prev; };
+	LcdMenuEntry* getNext() { return next; };
+	HANDLER getHandler() { return handler; };
 	
 private:
-	const short _id;
-	const char* _text;
+	const int id;
+	const char* text;
+	char* displayText;
+	LcdMenuEntry* parent;
+	LcdMenuEntry* child;
+	LcdMenuEntry* prev;
+	LcdMenuEntry* next;
+	HANDLER handler;
 };
 
 class LcdMenu
 {
 public:
     LcdMenu(const LiquidCrystal& lcd, const int cols, const int rows)  
-		:	_lcd(lcd), _rows(rows), _cols(cols) {
+		:	lcd(lcd), rows(rows), cols(cols) {
 	};
 	~LcdMenu();
 	
 	void setHead(LcdMenuEntry* main);
+	LcdMenuEntry* selectEntry(const char id);
+	boolean levelUp();
 	void display();
 	void clear();
 	boolean step();
 	boolean page();
 	boolean stepReverse();
 	boolean pageReverse();
-	void displayCurrent();
 		
 private:
-	LiquidCrystal _lcd;
-	LcdMenuEntry* _head;
-	LcdMenuEntry* _current;
-	int _cols;
-	int _rows;
+	LcdMenuEntry* getCurrentTop();
+		
+	LiquidCrystal lcd;
+	LcdMenuEntry* head;
+	LcdMenuEntry* current;
+	int cols;
+	int rows;
 };
 
 #endif
