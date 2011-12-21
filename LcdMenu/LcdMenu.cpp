@@ -82,6 +82,15 @@ LcdMenuEntry* LcdMenu::selectEntry(const char id) {
 	return NULL;	
 }
 
+void LcdMenuEntry::appendSibling(LcdMenuEntry* sibling) {
+	LcdMenuEntry* i = this;
+	while ( i-> next != NULL )
+		i = i-> next;
+
+	i->setSiblings(i->getPrev(), sibling);
+	sibling->setSiblings(i, NULL);
+}
+
 void LcdMenu::clear() {
 	lcd.clear();
 #ifdef DEBUG
@@ -179,10 +188,14 @@ void LcdMenu::display() {
 	
 	while ( curRow < rows && pos != NULL ) {
 #ifdef DEBUG
-		Serial.print("DISPLAY "); Serial.println(pos->getDisplayText());
+		Serial.print("DISPLAY (0,");
+		Serial.print(curRow);
+		Serial.print(") ");
+		Serial.println(pos->getDisplayText());
 #endif
 		lcd.setCursor(0, curRow);
 		lcd.print(pos->getDisplayText());
+		
 		curRow++;
 			
 		pos = pos->getNext();

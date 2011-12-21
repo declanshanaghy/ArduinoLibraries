@@ -1,7 +1,11 @@
 #ifndef LCDMENUh
 #define LCDMENUh
 
-#include <WProgram.h>
+#if ARDUINO >= 100
+#include "Arduino.h"
+#else
+#include "WProgram.h"
+#endif
 #include <LiquidCrystal.h>
 
 #define DEBUG 1
@@ -17,6 +21,7 @@ public:
 	void setPrev(LcdMenuEntry* prev) { this->prev = prev; };	
 	void setNext(LcdMenuEntry* next) { this->next = next; };	
 	void setSiblings(LcdMenuEntry* prev, LcdMenuEntry* next) { this->prev = prev; this->next = next; };	
+	void appendSibling(LcdMenuEntry* sibling);
 	
 	const char getId() { return id; };
 	const char* getDisplayText() { return displayText; };
