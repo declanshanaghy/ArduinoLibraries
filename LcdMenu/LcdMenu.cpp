@@ -1,6 +1,10 @@
 #include "LcdMenu.h"
 
-LcdMenuEntry::LcdMenuEntry(const char id, const char* text, HANDLER handler) 
+/**************************/
+/*      LcdMenuEntry      */
+/**************************/
+
+LcdMenuEntry::LcdMenuEntry(const char id, const char* text, LcdMenuHandler* handler) 
 	: id(id), text(text), handler(handler) {
 	displayText = (char*)malloc(sizeof(char) * strlen(text) + 4);
 	sprintf(displayText, "%c %s", id, text);
@@ -39,7 +43,7 @@ boolean LcdMenu::levelUp() {
 	return false;
 }
 
-LcdMenuEntry* LcdMenu::selectEntry(const char id) {
+LcdMenuHandler* LcdMenu::procKeyPress(const char id) {
 	LcdMenuEntry* i = getCurrentTop();
 	
 #ifdef DEBUG
@@ -53,11 +57,10 @@ LcdMenuEntry* LcdMenu::selectEntry(const char id) {
 #endif
 			if ( i->getHandler() != NULL ) {
 #ifdef DEBUG
-				Serial.println("CALL HANDLER");
+				Serial.println("DELEGATE TO HANDLER");
 #endif
 				//Fire off the handler for this menu item
-				(*i->getHandler())();
-				return i;				
+				return i->getHandler();
 			}
 			else if ( i->getChild() != NULL ){
 #ifdef DEBUG
@@ -65,7 +68,8 @@ LcdMenuEntry* LcdMenu::selectEntry(const char id) {
 #endif
 				//Navigate to sub menu
 				current = i->getChild();
-				return i;				
+				this->display();
+				return NULL;				
 			}
 			else {
 #ifdef DEBUG
@@ -91,8 +95,18 @@ void LcdMenuEntry::appendSibling(LcdMenuEntry* sibling) {
 	sibling->setSiblings(i, NULL);
 }
 
+/*********************/
+/*      LcdMenu      */
+/*********************/
+
+LcdMenu::LcdMenu(LiquidCrystal* lcd, const int cols, const int rows)  
+	:	lcd(lcd), rows(rows), cols(cols) {
+	head = NULL;
+	current = NULL;
+};
+
 void LcdMenu::clear() {
-	lcd.clear();
+	lcd->clear();
 #ifdef DEBUG
 	Serial.println("CLEAR");
 #endif
@@ -193,8 +207,8 @@ void LcdMenu::display() {
 		Serial.print(") ");
 		Serial.println(pos->getDisplayText());
 #endif
-		lcd.setCursor(0, curRow);
-		lcd.print(pos->getDisplayText());
+		lcd->setCursor(0, curRow);		
+		lcd->print(pos->getDisplayText());
 		
 		curRow++;
 			

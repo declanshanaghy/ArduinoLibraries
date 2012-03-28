@@ -7,14 +7,14 @@
 #include "WProgram.h"
 #endif
 #include <LiquidCrystal.h>
+#include "LcdMenuHandler.h"
 
 #define DEBUG 1
 
-typedef void (*HANDLER)(void);
 
 class LcdMenuEntry {
 public:
-	LcdMenuEntry(const char id, const char* text, HANDLER handler);
+	LcdMenuEntry(const char id, const char* text, LcdMenuHandler* handler);
 	~LcdMenuEntry();
 	
 	void setChild(LcdMenuEntry* child) { this->child = child; child->parent = this; };	
@@ -30,7 +30,7 @@ public:
 	LcdMenuEntry* getChild() { return child; };
 	LcdMenuEntry* getPrev() { return prev; };
 	LcdMenuEntry* getNext() { return next; };
-	HANDLER getHandler() { return handler; };
+	LcdMenuHandler* getHandler() { return handler; };
 	
 private:
 	const int id;
@@ -40,20 +40,19 @@ private:
 	LcdMenuEntry* child;
 	LcdMenuEntry* prev;
 	LcdMenuEntry* next;
-	HANDLER handler;
+	LcdMenuHandler* handler;
 };
 
 class LcdMenu
 {
 public:
-    LcdMenu(const LiquidCrystal& lcd, const int cols, const int rows)  
-		:	lcd(lcd), rows(rows), cols(cols) {
-	};
+    LcdMenu(LiquidCrystal* lcd, const int cols, const int rows);
 	~LcdMenu();
 	
 	void setHead(LcdMenuEntry* main);
-	LcdMenuEntry* selectEntry(const char id);
+	LcdMenuHandler* procKeyPress(const char id);
 	boolean levelUp();
+	void reset() { current = head; };
 	void display();
 	void clear();
 	boolean step();
@@ -64,7 +63,7 @@ public:
 private:
 	LcdMenuEntry* getCurrentTop();
 		
-	LiquidCrystal lcd;
+	LiquidCrystal* lcd;
 	LcdMenuEntry* head;
 	LcdMenuEntry* current;
 	int cols;
