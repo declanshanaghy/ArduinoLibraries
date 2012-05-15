@@ -1,16 +1,11 @@
 #ifndef LCDMENUh
 #define LCDMENUh
 
-#if ARDUINO >= 100
-#include "Arduino.h"
-#else
-#include "WProgram.h"
-#endif
+#include <Arduino.h>
 #include <LiquidCrystal.h>
 #include "LcdMenuHandler.h"
 
-#define DEBUG 1
-
+//#define DBG 0
 
 class LcdMenuEntry {
 public:

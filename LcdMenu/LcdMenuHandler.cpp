@@ -1,13 +1,8 @@
 #include "LcdMenuHandler.h"
 
 boolean LcdMenuHandler::procKeyPress(int k, char c) { 
-	lcd->clear();
-	lcd->setCursor(0, 0);		
-	lcd->print("HELLO "); 
-	lcd->setCursor(7, 0);		
-	lcd->print(count); 
-	
-	return count++ % 2 == 0; 
+	this->val = !this->val;
+	return false; 
 };
 
 void LcdMenuHandler::dispayConfirmation() {

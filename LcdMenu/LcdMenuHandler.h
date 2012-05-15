@@ -1,29 +1,33 @@
 #ifndef LCDMENUHANDLER_H
 #define LCDMENUHANDLER_H
 
+#include <Arduino.h>
 #include <LiquidCrystal.h>
 
-#if ARDUINO >= 100
-  #include <Arduino.h>
-#else
-  #include <WProgram.h>
-#endif
 
 class LcdMenuHandler {
 public:
-	LcdMenuHandler(): count(0) {};
-	void takeControl(LiquidCrystal* lcd) { this->lcd = lcd; count=0; };
-	void relinquishControl() { this->lcd != NULL; };
-	boolean wantsControl() { return this->lcd != NULL; };
+	LcdMenuHandler(int ident) { this->ident = ident; this->val = 0; };
+	virtual ~LcdMenuHandler() {};
+	void takeControl(LiquidCrystal* lcd) { this->lcd = lcd; this->active = true; };
+	void relinquishControl() { this->lcd = NULL; this->active = false; };
+	boolean wantsControl() { return this->active; };
 	
-	boolean procKeyPress(int k, char c);
-	void dispayCancellation(); 
-	void dispayConfirmation(); 
-;
+	virtual boolean procKeyPress(int k, char c);
+	virtual void dispayCancellation(); 
+	virtual void dispayConfirmation(); 
+
+	int getIdent() { return ident; };
+	void setValue(short value) { val = value; };
+	short getValue() { return val; };
+
+protected:
+	short val;
+	boolean active;
+	LiquidCrystal* lcd;
 	
 private:
-	LiquidCrystal* lcd;
-	int count;
+	int ident;
 };
 
 #endif //LCDMENUHANDLER_H

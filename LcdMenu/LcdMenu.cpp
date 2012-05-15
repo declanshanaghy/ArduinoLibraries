@@ -46,35 +46,35 @@ boolean LcdMenu::levelUp() {
 LcdMenuHandler* LcdMenu::procKeyPress(const char id) {
 	LcdMenuEntry* i = getCurrentTop();
 	
-#ifdef DEBUG
-	Serial.print("LOOKING FOR: "); Serial.println(id);
-#endif
+//#if DBG
+//	Serial.print("LOOKING FOR: "); Serial.println(id);
+//#endif
 	
 	while ( i != NULL ) {
 		if (i->getId() == id) {
-#ifdef DEBUG
-			Serial.print("FOUND: "); Serial.println(i->getId());
-#endif
+//#if DBG
+//			Serial.print("FOUND: "); Serial.println(i->getId());
+//#endif
 			if ( i->getHandler() != NULL ) {
-#ifdef DEBUG
-				Serial.println("DELEGATE TO HANDLER");
-#endif
+//#if DBG
+//				Serial.println("DELEGATE TO HANDLER");
+//#endif
 				//Fire off the handler for this menu item
 				return i->getHandler();
 			}
 			else if ( i->getChild() != NULL ){
-#ifdef DEBUG
-				Serial.print("NAVIGATE TO CHILD: "); Serial.println(i->getChild()->getId());
-#endif
+//#if DBG
+//				Serial.print("NAVIGATE TO CHILD: "); Serial.println(i->getChild()->getId());
+//#endif
 				//Navigate to sub menu
 				current = i->getChild();
 				this->display();
 				return NULL;				
 			}
 			else {
-#ifdef DEBUG
-				Serial.println("NO HANDLER OR CHILD");
-#endif
+//#if DBG
+//				Serial.println("NO HANDLER OR CHILD");
+//#endif
 				//Invalid menu entry - no handler or child
 				return NULL;
 			}
@@ -107,9 +107,9 @@ LcdMenu::LcdMenu(LiquidCrystal* lcd, const int cols, const int rows)
 
 void LcdMenu::clear() {
 	lcd->clear();
-#ifdef DEBUG
-	Serial.println("CLEAR");
-#endif
+//#if DBG
+//	Serial.println("CLEAR");
+//#endif
 }
 
 boolean LcdMenu::page() {
@@ -124,9 +124,9 @@ boolean LcdMenu::page() {
 			break;
 	}
 	
-#ifdef DEBUG
-	Serial.print("count == rows? "); Serial.print(count); Serial.print(" == "); Serial.println(rows);
-#endif		
+//#if DBG
+//	Serial.print("count == rows? "); Serial.print(count); Serial.print(" == "); Serial.println(rows);
+//#endif		
 	
 	if ( count == 0 ) {
 		return false;
@@ -144,15 +144,15 @@ boolean LcdMenu::page() {
 boolean LcdMenu::step() {
 	if ( current->getNext() != NULL && current->getNext()->getNext() != NULL ) {
 		current = current->getNext();
-#ifdef DEBUG
-		Serial.println("ADVANCE");
-#endif	
+//#if DBG
+//		Serial.println("ADVANCE");
+//#endif	
 		return true;
 	}
 	else {
-#ifdef DEBUG
-		Serial.println("CANT ADVANCE");
-#endif		
+//#if DBG
+//		Serial.println("CANT ADVANCE");
+//#endif		
 		return false;
 	}
 	
@@ -170,9 +170,9 @@ boolean LcdMenu::pageReverse() {
 			break;
 	}
 	
-#ifdef DEBUG
-	Serial.print("count == rows? "); Serial.print(count); Serial.print(" == "); Serial.println(rows);
-#endif		
+//#if DBG
+//	Serial.print("count == rows? "); Serial.print(count); Serial.print(" == "); Serial.println(rows);
+//#endif		
 	
 	current = i;
 	return count > 0;
@@ -181,15 +181,15 @@ boolean LcdMenu::pageReverse() {
 boolean LcdMenu::stepReverse() {
 	if ( current->getPrev() != NULL ) {
 		current = current->getPrev();
-#ifdef DEBUG
-		Serial.println("REVERSE");
-#endif		
+//#if DBG
+//		Serial.println("REVERSE");
+//#endif		
 		return true;
 	}
 	else {
-#if DEBUG
-		Serial.println("CANT REVERSE");
-#endif		
+//#if DBG
+//		Serial.println("CANT REVERSE");
+//#endif		
 		return false;
 	}
 	
@@ -201,12 +201,12 @@ void LcdMenu::display() {
 	short curRow = 0;
 	
 	while ( curRow < rows && pos != NULL ) {
-#ifdef DEBUG
-		Serial.print("DISPLAY (0,");
-		Serial.print(curRow);
-		Serial.print(") ");
-		Serial.println(pos->getDisplayText());
-#endif
+//#if DBG
+//		Serial.print("DISPLAY (0,");
+//		Serial.print(curRow);
+//		Serial.print(") ");
+//		Serial.println(pos->getDisplayText());
+//#endif
 		lcd->setCursor(0, curRow);		
 		lcd->print(pos->getDisplayText());
 		
@@ -214,7 +214,7 @@ void LcdMenu::display() {
 			
 		pos = pos->getNext();
 	}
-#ifdef DEBUG
-		Serial.println("DISPLAY DONE");
-#endif
+//#if DBG
+//		Serial.println("DISPLAY DONE");
+//#endif
 }
