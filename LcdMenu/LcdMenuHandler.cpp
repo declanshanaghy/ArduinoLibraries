@@ -5,14 +5,14 @@ boolean LcdMenuHandler::procKeyPress(int k, char c) {
 	return false; 
 };
 
-void LcdMenuHandler::dispayConfirmation() {
+void LcdMenuHandler::displayConfirmation() {
 	lcd->setCursor(5, 0);
 	lcd->print("=-==-=");      
 	lcd->setCursor(3, 1);
 	lcd->print("=-= OK =-=");      
 }
 
-void LcdMenuHandler::dispayCancellation() {
+void LcdMenuHandler::displayCancellation() {
 	lcd->setCursor(5, 0);
 	lcd->print("=-==-=");      
 	lcd->setCursor(3, 1);
