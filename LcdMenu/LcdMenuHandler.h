@@ -20,20 +20,31 @@ public:
 	virtual void displayStart() {}; 
 	virtual void displayCancellation(); 
 	virtual void displayConfirmation(); 
-
-	int getIdent() { return ident; };
 	virtual short getValueType() { return TYPE_SHORT; };
+
+	boolean isConfirmed() { return this->confirmed; };
+	boolean isValid() { return this->valid; };
+	int getIdent() { return ident; };
 	
 	void setValue(long value) { val = value; };
 	long getValue() { return val; };
 
 protected:
+	// Holds internal state between keypresses
 	short state;
+	// Determines whether the user canceled or confirmed the action before the handler exited
+	boolean confirmed;
+	// Determines whether the last keypress was valid input or not
+	boolean valid;
+	// The value the user entered
 	long val;
+	// Whether the handler is currently active (receiving keypresses)
 	boolean active;
+	// The attached LCD to output user feedback
 	LiquidCrystal* lcd;
 	
 private:
+	// Handler identity (should be unique to this handler)
 	int ident;
 };
 
