@@ -12,7 +12,7 @@ class LcdMenuHandler {
 public:
 	LcdMenuHandler(int ident) { this->ident = ident; this->val = 0; this->state=0; };
 	virtual ~LcdMenuHandler() {};
-	void takeControl(LiquidCrystal* lcd) { this->lcd = lcd; this->active = true; };
+	void takeControl(LiquidCrystal* lcd) { this->lcd = lcd; this->active = true; this->state=0; };
 	void relinquishControl() { this->lcd = NULL; this->active = false; };
 	boolean wantsControl() { return this->active; };
 	
